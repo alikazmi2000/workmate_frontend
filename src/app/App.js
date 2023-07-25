@@ -4,7 +4,9 @@ import './App.scss';
 import AppRoutes from './AppRoutes';
 import { Provider } from 'react-redux';
 import store from './store';
-
+import 'react-datetime-picker/dist/DateTimePicker.css';
+import 'react-calendar/dist/Calendar.css';
+import 'react-clock/dist/Clock.css';
 class App extends Component {
   state = {}
   componentDidMount() {

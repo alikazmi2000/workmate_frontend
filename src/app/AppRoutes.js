@@ -26,7 +26,10 @@ const Error500 = lazy(() => import('./error-pages/Error500'));
 const Login = lazy(() => import('./user-pages/Login'));
 const SignUp = lazy(() => import('./user-pages/Register'));
 const Jobs = lazy(() => import('./jobs/index'));
+const MyJobs = lazy(() => import('./my-jobs/index'));
 const Workers = lazy(() => import('./workers/index'));
+const Vendors = lazy(() => import('./vendors/index'));
+const Customers = lazy(() => import('./customers/index'));
 
 
 const PublicRoute = ({ component: Component, ...rest }) => {
@@ -67,9 +70,10 @@ class AppRoutes extends Component {
           <PublicRoute path="/form-Elements/basic-elements" component={BasicElements} />
 
           <PublicRoute path="/jobs" component={Jobs} />
+          <PublicRoute path="/my-jobs" component={MyJobs} />
           <PublicRoute path="/workers" component={Workers} />
-          <PublicRoute path="/vendors" component={BasicTable} />
-          <PublicRoute path="/customers" component={BasicTable} />
+          <PublicRoute path="/vendors" component={Vendors} />
+          <PublicRoute path="/customers" component={Customers} />
 
           <PublicRoute path="/icons/mdi" component={Mdi} />
 

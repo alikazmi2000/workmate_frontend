@@ -20,23 +20,23 @@ const userReducer = (state = initialState, action) => {
       localStorage.setItem("token", action.payload.token);
       localStorage.setItem("userData", JSON.stringify(action.payload.data));
       return { ...state, user: action.payload.data };
-    case 'users/signup_SUCCESS':
-      console.log(action.payload);
-      localStorage.clear();
-      localStorage.setItem("token", action.payload.token);
-      localStorage.setItem("userData", JSON.stringify(action.payload.data));
-      return { ...state, user: action.payload.data };
-    case 'users/addUser_SUCCESS' || 'users/update_SUCCESS':
-      return { ...state, newUser: action.payload.data };
 
+    case 'users/addUser_SUCCESS' :
+      return { ...state, newUser: action.payload.data };
+    case 'users/update_SUCCESS':
+      return { ...state, newUser: action.payload.data };
     case 'users/login_SUCCESS':
       console.log(action.payload);
       localStorage.clear();
       localStorage.setItem("token", action.payload.token);
       localStorage.setItem("userData", JSON.stringify(action.payload.data));
       return { ...state, user: action.payload.data };
-    case 'users/getAll/worker_SUCCESS' || 'users/getAll/customer_SUCCESS' || 'users/getAll/vendor_SUCCESS':
-      return { ...state, users: action.payload.data, pagination: action.payload.pagination };
+    case 'users/getAll/worker_SUCCESS':
+      return { ...state, users: [...action.payload.data], pagination: action.payload.pagination };
+    case 'users/getAll/vendor_SUCCESS':
+      return { ...state, users: [...action.payload.data], pagination: action.payload.pagination };
+    case 'users/getAll/customer_SUCCESS':
+      return { ...state, users: [...action.payload.data], pagination: action.payload.pagination };
 
     case 'CLEAR_USER':
       return { ...state, user: null };

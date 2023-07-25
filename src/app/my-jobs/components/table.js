@@ -1,44 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import Modal from './modal';
-import StartModal from './startModal';
-import DeleteModal from './deleteModal';
+import ScheduleModal from "./scheduleAppointment";
 import moment from "moment";
 import { BsTrash, BsPencilFill, BsPlay } from "react-icons/bs";
-import { BiRefresh ,BiMoney} from "react-icons/bi";
+import { BiRefresh, BiTimeFive, BiMoney } from "react-icons/bi";
 import { DataGetAction } from "../../redux/actions/actionUtils";
 import { Pagination } from 'react-bootstrap'; // Import Pagination component
 
 const Index = () => {
-    const [openModal, setOpenModal] = useState(false);
+    const [openScheduleModal, setOpenScheduleModal] = useState(false);
     const [selectedRow, setSelectedRow] = useState({});
-    const [openDeleteModal, setOpenDeleteModal] = useState(false);
-    const [openStartModal, setOpenStartModal] = useState(false);
     const tableData = useSelector((state) => state.job.jobs) || [];
     const pagination = useSelector((state) => state.job.pagination) || {};
     const dispatch = useDispatch();
     const userData = JSON.parse(localStorage.getItem('userData'));
-    const onEdit = (row) => {
-        setOpenModal(true);
-        setSelectedRow(row)
-    }
-    const onStart = (row) => {
-        setOpenStartModal(true);
-        setSelectedRow(row)
-    }
-    const onDelete = (row) => {
-        setOpenDeleteModal(true);
+
+    const onSchedule = (row) => {
+        setOpenScheduleModal(true);
         setSelectedRow(row)
     }
 
     useEffect(() => {
-        dispatch(DataGetAction("jobs/getAll", '', ''))
+        dispatch(DataGetAction("jobs/getMyJobs", '', ''))
     }, [pagination.currentPage]); // Update the useEffect dependency to include pagination.currentPage
 
+    // Calculate the total number of pages
     const totalPages = Math.ceil(pagination.totalItems / pagination.limit);
 
+    // Define a function to handle page change
     const handlePageChange = (page) => {
-        dispatch(DataGetAction("jobs/getAll", '', `page=${page}`));
+        dispatch(DataGetAction("jobs/getMyJobs", '', `page=${page}`));
     }
     const createStatus = (status) => {
         switch (status) {
@@ -68,6 +59,13 @@ const Index = () => {
                 return null;
         }
     }
+
+    const actionButtonGenerator = (data) => {
+        if (data.status == 'in_review' && userData.role == 'manager') {
+            return <BiTimeFive onClick={() => { onSchedule() }} style={{ cursor: 'pointer' }} title='Schedule Appointment' className='mx-2' size={'1.4rem'} color='orange'></BiTimeFive>
+        }
+
+    }
     return (
         <div className="row">
             <div className="col-lg-12 grid-margin stretch-card">
@@ -75,14 +73,13 @@ const Index = () => {
                     <div className="card-body">
                         <div className='row'>
                             <div className='col-6'>
-                                <h4 className="card-title">Job Board</h4>
-                                <p className="card-description">Job Posted Here</p>
+                                <h4 className="card-title">My Jobs</h4>
+                                <p className="card-description">You can manage your jobs here</p>
                             </div>
                             <div className='col-6'>
                                 <BiRefresh onClick={() => {
                                     dispatch(DataGetAction("jobs/getAll", '', ''))
                                 }} size={'1.4rem'} className='ml-3 float-right' />
-                                <button type="button" onClick={() => setOpenModal(true)} className="btn btn-primary float-right">Add</button>
                             </div>
                         </div>
                         <div className="table-responsive">
@@ -118,24 +115,22 @@ const Index = () => {
                                                     <td>{moment(e.createdAt).format("LLLL")}</td>
                                                     <td>{createStatus(e.status)}</td>
                                                     <td>
-                                                        <BsPencilFill onClick={() => { onEdit(e) }} color='blue' />
-                                                        {" | "}
-                                                        <BsTrash color='red' onClick={() => { onDelete(e) }} />
+                                                        {actionButtonGenerator(e)}
+                                                        {/* <BsPencilFill onClick={() => { onEdit(e) }} color='blue' /> */}
+                                                        {/* {" | "} */}
+                                                        {/* <BsTrash color='red' onClick={() => { onDelete(e) }} />
                                                         {
                                                             " | "
-                                                        }
-                                                        {
-                                                            userData.role == 'manager' && e.status == 'new' && (
-                                                                <BsPlay color='green' size={"1.4rem"} onClick={() => { onStart(e) }} ></BsPlay>
-
-                                                            )
+                                                        } */}
+                                                        {/* {
+                                                           
                                                         }
                                                         {
                                                             ['worker', 'vendor'].includes(userData.role) && e.status == 'active' && (
                                                                 <BiMoney color='green' size={"1.4rem"} onClick={() => { onStart(e) }} ></BiMoney>
 
                                                             )
-                                                        }
+                                                        } */}
                                                     </td>
                                                 </tr>
                                             )
@@ -169,9 +164,7 @@ const Index = () => {
                     />
                 </Pagination>
             </div>
-            <Modal openModal={openModal} setOpenModal={setOpenModal} data={selectedRow} />
-            <DeleteModal openModal={openDeleteModal} setOpenModal={setOpenDeleteModal} data={selectedRow} />
-            <StartModal openModal={openStartModal} setOpenModal={setOpenStartModal} data={selectedRow} />
+            <ScheduleModal openModal={openScheduleModal} setOpenModal={setOpenScheduleModal} data={selectedRow} />
         </div >
     )
 }

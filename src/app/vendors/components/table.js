@@ -14,7 +14,7 @@ const Index = () => {
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const tableData = useSelector((state) => state.user.users) || [];
     const newUser = useSelector((state) => state.user.newUser) || {};
-    console.log(tableData);
+    console.log("============",tableData);
     const pagination = useSelector((state) => state.user.pagination) || {};
     const dispatch = useDispatch();
     const onEdit = (row) => {
@@ -26,7 +26,7 @@ const Index = () => {
         setSelectedRow(row)
     }
     useEffect(() => {
-        dispatch(DataGetAction("users/getAll/worker", '', ''))
+        dispatch(DataGetAction("users/getAll/vendor", '', ''))
     }, [newUser]);
 
     // Calculate the total number of pages
@@ -34,7 +34,7 @@ const Index = () => {
 
     // Define a function to handle page change
     const handlePageChange = (page) => {
-        dispatch(DataGetAction("users/getAll/worker", '', `page=${page}`));
+        dispatch(DataGetAction("users/getAll/vendor", '', `page=${page}`));
     }
 
     return (
@@ -44,12 +44,12 @@ const Index = () => {
                     <div className="card-body">
                         <div className='row'>
                             <div className='col-6'>
-                                <h4 className="card-title">Workers Data</h4>
+                                <h4 className="card-title">Vendors Data</h4>
                                 <p className="card-description"> You can manage your users here</p>
                             </div>
                             <div className='col-6'>
                                 <BiRefresh onClick={() => {
-                                    dispatch(DataGetAction("users/getAll/worker", '', ''))
+                                    dispatch(DataGetAction("users/getAll/vendor", '', ''))
                                 }} size={'1.4rem'} className='ml-3 float-right' />
                                 <button type="button" onClick={() => setOpenModal(true)} className="btn btn-primary float-right ">Add</button>
                             </div>

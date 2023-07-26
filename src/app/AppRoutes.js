@@ -30,6 +30,7 @@ const MyJobs = lazy(() => import('./my-jobs/index'));
 const Workers = lazy(() => import('./workers/index'));
 const Vendors = lazy(() => import('./vendors/index'));
 const Customers = lazy(() => import('./customers/index'));
+const Bids = lazy(() => import('./bids/index'));
 
 
 const PublicRoute = ({ component: Component, ...rest }) => {
@@ -64,22 +65,13 @@ class AppRoutes extends Component {
         <Switch>
           <PublicRoute exact path="/" component={BasicTable} />
 
-          <PublicRoute path="/basic-ui/buttons" component={Buttons} />
-          <PublicRoute path="/basic-ui/dropdowns" component={Dropdowns} />
-
-          <PublicRoute path="/form-Elements/basic-elements" component={BasicElements} />
 
           <PublicRoute path="/jobs" component={Jobs} />
           <PublicRoute path="/my-jobs" component={MyJobs} />
           <PublicRoute path="/workers" component={Workers} />
+          <PublicRoute path="/bid-list" component={Bids} />
           <PublicRoute path="/vendors" component={Vendors} />
           <PublicRoute path="/customers" component={Customers} />
-
-          <PublicRoute path="/icons/mdi" component={Mdi} />
-
-          <PublicRoute path="/charts/chart-js" component={ChartJs} />
-
-
           <Route path="/login" component={Login} />
           <Route path="/sign-up" component={SignUp} />
 

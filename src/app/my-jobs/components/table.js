@@ -11,8 +11,10 @@ import { FcSurvey } from "react-icons/fc";
 import { DataGetAction } from "../../redux/actions/actionUtils";
 import { Pagination } from 'react-bootstrap'; // Import Pagination component
 import { BsEye } from 'react-icons/bs';
+import { useHistory } from 'react-router-dom';
 
 const Index = () => {
+    const history = useHistory();
     const [openScheduleModal, setOpenScheduleModal] = useState(false);
     const [openSurveyModal, setOpenSurveyModal] = useState(false);
     const [openWorkerBidModal, setOpenWorkerBidModal] = useState(false);
@@ -43,10 +45,8 @@ const Index = () => {
         dispatch(DataGetAction("jobs/getMyJobs", '', ''))
     }, [pagination.currentPage]); // Update the useEffect dependency to include pagination.currentPage
 
-    // Calculate the total number of pages
     const totalPages = Math.ceil(pagination.totalItems / pagination.limit);
 
-    // Define a function to handle page change
     const handlePageChange = (page) => {
         dispatch(DataGetAction("jobs/getMyJobs", '', `page=${page}`));
     }
@@ -98,13 +98,16 @@ const Index = () => {
                 }} />
             </>
         }
-        if (data.status == 'active') {
-            return <>
-                <BiMoney title='Reason' size={'1.4rem'} style={{ cursor: 'pointer' }} onClick={() => {
-                    onBid(data)
-
-                }} />
-            </>
+        if (data.status == 'active' && userData.role == 'manager') {
+            return <span
+                onClick={() => {
+                    history.push(`/bid-list?id=${data._id}`);
+                }}
+                style={{
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    color: 'blue'
+                }}>View Bids</span>
         }
 
     }

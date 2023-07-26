@@ -50,7 +50,7 @@ const Index = () => {
         setSelectedRow(row)
     }
     const actionButtonGenerator = (data) => {
-        if (data.status === 'new') {
+        if (data.status === 'new' && userData.role == 'customer') {
             return <>
                 <BsPencilFill onClick={() => { onEdit(data) }} color='blue' />
                 {" | "}
@@ -66,7 +66,7 @@ const Index = () => {
                 }} />
             </>
         }
-        if (userData.role == 'manager' && data.status == 'new')
+        if ( data.status == 'new')
             return <BsPlay color='green' size={"1.4rem"} onClick={() => { onStart(data) }} ></BsPlay>
 
 
@@ -167,7 +167,7 @@ const Index = () => {
                                                     <td>{e.name}</td>
                                                     <td>{e.description}</td>
                                                     <td>{e.category}</td>
-                                                    <td>{e.assignedTo}</td>
+                                                    <td>{e.assignedTo && e.assignedTo.firstName + ' ' + e.assignedTo.lastName}</td>
                                                     <td>{e.jobRequester && e.jobRequester.firstName + ' ' + e.jobRequester.lastName}</td>
                                                     <td>{e.jobManager && e.jobManager.firstName + ' ' + e.jobManager.lastName}</td>
                                                     <td>{e.jobVendor && e.jobVendor.firstName + ' ' + e.jobVendor.lastName}</td>

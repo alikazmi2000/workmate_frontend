@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import ScheduleModal from "./scheduleAppointment";
+import SurveyModal from "./surveyModal";
+import CancelModal from "./cancelModal";
+import WorkerBidModal from "./workerBidModal";
 import moment from "moment";
-import { BsTrash, BsPencilFill, BsPlay } from "react-icons/bs";
-import { BiRefresh, BiTimeFive, BiMoney } from "react-icons/bi";
+import { BiRefresh, BiTimeFive, BiMoney, BiTrash } from "react-icons/bi";
+import { AiFillEye } from "react-icons/ai";
+import { FcSurvey } from "react-icons/fc";
 import { DataGetAction } from "../../redux/actions/actionUtils";
 import { Pagination } from 'react-bootstrap'; // Import Pagination component
+import { BsEye } from 'react-icons/bs';
 
 const Index = () => {
     const [openScheduleModal, setOpenScheduleModal] = useState(false);
+    const [openSurveyModal, setOpenSurveyModal] = useState(false);
+    const [openWorkerBidModal, setOpenWorkerBidModal] = useState(false);
+    const [openCancelModal, setOpenCancelModal] = useState(false);
     const [selectedRow, setSelectedRow] = useState({});
     const tableData = useSelector((state) => state.job.jobs) || [];
     const pagination = useSelector((state) => state.job.pagination) || {};
@@ -19,7 +27,18 @@ const Index = () => {
         setOpenScheduleModal(true);
         setSelectedRow(row)
     }
-
+    const onSurvey = (row) => {
+        setOpenSurveyModal(true);
+        setSelectedRow(row)
+    }
+    const onCancel = (row) => {
+        setOpenCancelModal(true);
+        setSelectedRow(row)
+    }
+    const onBid = (row) => {
+        setOpenWorkerBidModal(true);
+        setSelectedRow(row)
+    }
     useEffect(() => {
         dispatch(DataGetAction("jobs/getMyJobs", '', ''))
     }, [pagination.currentPage]); // Update the useEffect dependency to include pagination.currentPage
@@ -37,8 +56,8 @@ const Index = () => {
                 return <label className="badge badge-success">New</label>;
             case 'in_review':
                 return <label className="badge badge-info">In Review</label>;
-            case 'scheduling':
-                return <label className="badge badge-primary">Scheduling</label>;
+            case 'scheduled':
+                return <label className="badge badge-primary">Scheduled</label>;
             case 'active':
                 return <label className="badge badge-primary">Active</label>;
             case 'confirmed':
@@ -62,7 +81,30 @@ const Index = () => {
 
     const actionButtonGenerator = (data) => {
         if (data.status == 'in_review' && userData.role == 'manager') {
-            return <BiTimeFive onClick={() => { onSchedule() }} style={{ cursor: 'pointer' }} title='Schedule Appointment' className='mx-2' size={'1.4rem'} color='orange'></BiTimeFive>
+            return <BiTimeFive onClick={() => { onSchedule(data) }} style={{ cursor: 'pointer' }} title='Schedule Appointment' className='mx-2' size={'1.4rem'} color='orange'></BiTimeFive>
+        }
+        if (data.status == 'scheduled' && userData.role == 'manager') {
+            return <>
+                <FcSurvey onClick={() => { onSurvey(data) }} style={{ cursor: 'pointer' }} title='Schedule Appointment' className='mx-2' size={'1.4rem'} color='orange'></FcSurvey>
+                {" | "}
+                <BiTrash color='red' size={'1.4rem'} style={{ cursor: 'pointer' }} title='Cancel Job' onClick={() => { onCancel(data) }} />
+            </>
+        }
+        if (data.status == 'cancelled') {
+            return <>
+                <AiFillEye title='Bid' size={'1.4rem'} style={{ cursor: 'pointer' }} onClick={() => {
+                    onCancel(data)
+
+                }} />
+            </>
+        }
+        if (data.status == 'active') {
+            return <>
+                <BiMoney title='Reason' size={'1.4rem'} style={{ cursor: 'pointer' }} onClick={() => {
+                    onBid(data)
+
+                }} />
+            </>
         }
 
     }
@@ -78,7 +120,7 @@ const Index = () => {
                             </div>
                             <div className='col-6'>
                                 <BiRefresh onClick={() => {
-                                    dispatch(DataGetAction("jobs/getAll", '', ''))
+                                    dispatch(DataGetAction("jobs/getMyJobs", '', ''))
                                 }} size={'1.4rem'} className='ml-3 float-right' />
                             </div>
                         </div>
@@ -165,6 +207,9 @@ const Index = () => {
                 </Pagination>
             </div>
             <ScheduleModal openModal={openScheduleModal} setOpenModal={setOpenScheduleModal} data={selectedRow} />
+            <SurveyModal openModal={openSurveyModal} setOpenModal={setOpenSurveyModal} data={selectedRow} />
+            <CancelModal openModal={openCancelModal} setOpenModal={setOpenCancelModal} data={selectedRow} />
+            <WorkerBidModal openModal={openWorkerBidModal} setOpenModal={setOpenWorkerBidModal} data={selectedRow} />
         </div >
     )
 }

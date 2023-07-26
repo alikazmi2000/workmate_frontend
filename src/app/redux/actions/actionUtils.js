@@ -38,6 +38,28 @@ export const DataRequestAction = (method, type, data, redirectUrl, showNotificat
     };
 };
 
+export const DataRequestNoDispatch = (method, type, data, redirectUrl, showNotification = true, Loading = "LOADING") => {
+        const token = localStorage.getItem('token');
+        try {
+            return fetch(`${ROOT_URL}/${type}`, {
+                method,
+                headers: new Headers({
+                    "Content-Type": "application/json",
+                    'authorization': 'Bearer ' + token
+                }),
+                body: JSON.stringify(data)
+            }).then((response) => {
+               return response.json().then((response) => {
+                    return response
+                })
+
+            }).catch((err) => {
+                return undefined;
+            })
+        } catch (error) {
+            return undefined;
+        }
+};
 
 export const DataGetAction = (type, data, query) => {
     return function (dispatch) {

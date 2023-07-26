@@ -5,18 +5,29 @@ import StartModal from './startModal';
 import DeleteModal from './deleteModal';
 import moment from "moment";
 import { BsTrash, BsPencilFill, BsPlay } from "react-icons/bs";
-import { BiRefresh ,BiMoney} from "react-icons/bi";
+import { BiRefresh, BiMoney } from "react-icons/bi";
+import { AiFillEye } from "react-icons/ai";
 import { DataGetAction } from "../../redux/actions/actionUtils";
 import { Pagination } from 'react-bootstrap'; // Import Pagination component
+import WorkerBidModal from "./workerBidModal";
+import VendorBidModal from "./vendorBidModal";
+import CancelModal from "./cancelModal";
 
 const Index = () => {
     const [openModal, setOpenModal] = useState(false);
     const [selectedRow, setSelectedRow] = useState({});
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
+    const [openWorkerBidModal, setOpenWorkerBidModal] = useState(false);
+    const [openVendorBidModal, setOpenVendorBidModal] = useState(false);
+    const [openCancelModal, setOpenCancelModal] = useState(false);
     const [openStartModal, setOpenStartModal] = useState(false);
     const tableData = useSelector((state) => state.job.jobs) || [];
     const pagination = useSelector((state) => state.job.pagination) || {};
     const dispatch = useDispatch();
+    const onCancel = (row) => {
+        setOpenCancelModal(true);
+        setSelectedRow(row)
+    }
     const userData = JSON.parse(localStorage.getItem('userData'));
     const onEdit = (row) => {
         setOpenModal(true);
@@ -30,7 +41,53 @@ const Index = () => {
         setOpenDeleteModal(true);
         setSelectedRow(row)
     }
+    const onWorkerBid = (row) => {
+        setOpenWorkerBidModal(true);
+        setSelectedRow(row)
+    }
+    const onVendorBid = (row) => {
+        setOpenVendorBidModal(true);
+        setSelectedRow(row)
+    }
+    const actionButtonGenerator = (data) => {
+        if (data.status === 'new') {
+            return <>
+                <BsPencilFill onClick={() => { onEdit(data) }} color='blue' />
+                {" | "}
+                <BsTrash color='red' onClick={() => { onDelete(data) }} />
 
+            </>
+        }
+        if (data.status == 'cancelled') {
+            return <>
+                <AiFillEye title='Bid' size={'1.4rem'} style={{ cursor: 'pointer' }} onClick={() => {
+                    onCancel(data)
+
+                }} />
+            </>
+        }
+        if (userData.role == 'manager' && data.status == 'new')
+            return <BsPlay color='green' size={"1.4rem"} onClick={() => { onStart(data) }} ></BsPlay>
+
+
+        if (data.status == 'active' && userData.role == 'worker') {
+            return <>
+                <BiMoney color='green' title='Worker Bid' size={'1.4rem'} style={{ cursor: 'pointer' }} onClick={() => {
+                    onWorkerBid(data)
+
+                }} />
+            </>
+        }
+        if (data.status == 'active' && userData.role == 'vendor') {
+            return <>
+                <BiMoney  color='green' title='Vendor Bid' size={'1.4rem'} style={{ cursor: 'pointer' }} onClick={() => {
+                    onVendorBid(data)
+
+                }} />
+            </>
+        }
+
+    }
     useEffect(() => {
         dispatch(DataGetAction("jobs/getAll", '', ''))
     }, [pagination.currentPage]); // Update the useEffect dependency to include pagination.currentPage
@@ -46,8 +103,8 @@ const Index = () => {
                 return <label className="badge badge-success">New</label>;
             case 'in_review':
                 return <label className="badge badge-info">In Review</label>;
-            case 'scheduling':
-                return <label className="badge badge-primary">Scheduling</label>;
+            case 'scheduled':
+                return <label className="badge badge-primary">Scheduled</label>;
             case 'active':
                 return <label className="badge badge-primary">Active</label>;
             case 'confirmed':
@@ -118,24 +175,8 @@ const Index = () => {
                                                     <td>{moment(e.createdAt).format("LLLL")}</td>
                                                     <td>{createStatus(e.status)}</td>
                                                     <td>
-                                                        <BsPencilFill onClick={() => { onEdit(e) }} color='blue' />
-                                                        {" | "}
-                                                        <BsTrash color='red' onClick={() => { onDelete(e) }} />
-                                                        {
-                                                            " | "
-                                                        }
-                                                        {
-                                                            userData.role == 'manager' && e.status == 'new' && (
-                                                                <BsPlay color='green' size={"1.4rem"} onClick={() => { onStart(e) }} ></BsPlay>
 
-                                                            )
-                                                        }
-                                                        {
-                                                            ['worker', 'vendor'].includes(userData.role) && e.status == 'active' && (
-                                                                <BiMoney color='green' size={"1.4rem"} onClick={() => { onStart(e) }} ></BiMoney>
-
-                                                            )
-                                                        }
+                                                        {actionButtonGenerator(e)}
                                                     </td>
                                                 </tr>
                                             )
@@ -172,6 +213,14 @@ const Index = () => {
             <Modal openModal={openModal} setOpenModal={setOpenModal} data={selectedRow} />
             <DeleteModal openModal={openDeleteModal} setOpenModal={setOpenDeleteModal} data={selectedRow} />
             <StartModal openModal={openStartModal} setOpenModal={setOpenStartModal} data={selectedRow} />
+            {openWorkerBidModal && (
+                <WorkerBidModal openModal={openWorkerBidModal} setOpenModal={setOpenWorkerBidModal} data={selectedRow} />
+            )}
+             {openVendorBidModal && (
+                <VendorBidModal openModal={openVendorBidModal} setOpenModal={setOpenVendorBidModal} data={selectedRow} />
+            )}
+            <CancelModal openModal={openCancelModal} setOpenModal={setOpenCancelModal} data={selectedRow} />
+
         </div >
     )
 }

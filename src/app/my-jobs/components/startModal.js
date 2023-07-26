@@ -16,7 +16,7 @@ const Index = ({ openModal, setOpenModal, data }) => {
     return <>
         <Modal show={openModal} onHide={onClose}>
             <Modal.Header closeButton>
-                <Modal.Title>Dear {user.firstName + ' ' + user.lastName} </Modal.Title>
+                <Modal.Title>Dear {user.first_name + ' ' + user.last_name} </Modal.Title>
             </Modal.Header>
             <Modal.Body>You are ready to manage this job</Modal.Body>
             <Modal.Footer>

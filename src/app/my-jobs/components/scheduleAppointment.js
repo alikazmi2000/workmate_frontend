@@ -13,13 +13,15 @@ const Index = ({ openModal, setOpenModal, data }) => {
         setOpenModal(false)
     }
     const onAccept = () => {
-        dispatch(DataRequestAction('POST', 'jobs/startJob', { _id: data._id }));
+        console.log('===i am called====',data)
+        dispatch(DataRequestAction('POST', 'jobs/scheduleJob', { _id: data._id, scheduleTime: value }));
+        setOpenModal(false)
 
     }
     return <>
-        <Modal show={openModal} onHide={onClose}>
+        <Modal show={openModal} onHide={onClose} >
             <Modal.Header closeButton>
-                <Modal.Title>Dear {user.firstName + ' ' + user.lastName} </Modal.Title>
+                <Modal.Title>Dear {user.first_name + ' ' + user.last_name} </Modal.Title>
             </Modal.Header>
             <Modal.Body>
 

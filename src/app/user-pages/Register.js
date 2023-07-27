@@ -88,6 +88,7 @@ const Index = () => {
                         <option value="worker">Worker</option>
                         <option value="customer">Customer</option>
                         <option value="vendor">Vendor</option>
+                        <option value="manager">Manager</option>
                       </Field>
                       <div className="text-danger">{touched.role && errors.role}</div>
                     </div>

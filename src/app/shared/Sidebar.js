@@ -49,10 +49,24 @@ class Sidebar extends Component {
     }));
 
   }
+  renderNavBarColor = (role) => {
+    switch (role) {
+      case "manager":
+        return "blue"
+      case "worker":
+        return "red"
+      case "customer":
+        return "green"
+      case "vendor":
+        return "grey"
+      default:
+        break;
+    }
+  }
   render() {
     const userData = JSON.parse(localStorage.getItem('userData'));
     return (
-      <nav className="sidebar sidebar-offcanvas" id="sidebar">
+      <nav style={{ background: this.renderNavBarColor(userData.role) }} className="sidebar sidebar-offcanvas" id="sidebar">
         <div className="text-center sidebar-brand-wrapper d-flex align-items-center">
           {/* <a className="sidebar-brand brand-logo" href="index.html"><img src={require("../../assets/images/logo.svg")} alt="logo" /></a> */}
           {/* <a className="sidebar-brand brand-logo-mini pt-3" href="index.html"><img src={require("../../assets/images/logo-mini.svg")} alt="logo" /></a> */}

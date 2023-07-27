@@ -42,12 +42,7 @@ const userReducer = (state = initialState, action) => {
         localStorage.clear();
         return {
           ...state,
-          user: null,
-          users: [],
-          newUser: {},
-          pagination: {
 
-          },
         };
       }
     case 'CLEAR_USER':

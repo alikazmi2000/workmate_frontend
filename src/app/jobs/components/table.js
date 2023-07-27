@@ -115,6 +115,8 @@ const Index = () => {
                 return <label className="badge badge-success">Completed</label>;
             case 'paid':
                 return <label className="badge badge-success">Paid</label>;
+            case 'not_paid':
+                return <label className="badge badge-danger">Not Paid</label>;
             case 'finished':
                 return <label className="badge badge-success">Finished</label>;
             case 'cancelled':

@@ -6,6 +6,7 @@ import Modal from 'react-bootstrap/Modal';
 import DatetimePicker from 'react-datetime-picker';
 import { useDispatch } from 'react-redux';
 import { DataRequestAction } from '../../redux/actions/actionUtils';
+import SurveyViewModal from './surveyViewModal';
 
 const validationSchema = Yup.object().shape({
     bidPrice: Yup.number().required('Bid price is required').min(0, 'Bid price must be a positive number'),
@@ -14,43 +15,65 @@ const validationSchema = Yup.object().shape({
     appointmentDate: Yup.date().required('Appointment date is required'),
 });
 
-const Index = ({ openModal, setOpenModal, data }) => {
+const Index = ({ openModal, setOpenModal, data, jobMode = '', setJobMode, role = 'worker' }) => {
     const dispatch = useDispatch();
     const handleClose = () => {
         setOpenModal(false);
     };
-
     const handleSubmit = (values) => {
         console.log('Form values:', values, data);
-        dispatch(DataRequestAction('POST', 'bids/create', {
-            jobId: data._id,
-            bidType:'worker_bid',
-            ...values
+        if (jobMode == 'bid') {
+            dispatch(DataRequestAction('POST', 'bids/create', {
+                jobId: data._id,
+                bidType: 'worker_bid',
+                ...values
 
-        }));
+            }));
+            setJobMode('')
+        }
+        else if (jobMode == 'initialize') {
+            dispatch(DataRequestAction('POST', 'jobs/initializeJob', {
+                _id: data._id,
+                ...values
+
+            }));
+            setJobMode('')
+
+        }
+        else if (jobMode === 'completed' && role == 'worker') {
+            dispatch(DataRequestAction('POST', 'jobs/completeJob', {
+                _id: data._id,
+                ...values
+
+            }));
+            setJobMode('')
+        }
+        else if (jobMode === 'not_paid' && role == 'manager') {
+            dispatch(DataRequestAction('POST', 'jobs/askPayment', {
+                _id: data._id,
+                ...values
+
+            }));
+            setJobMode('')
+        }
         handleClose();
     };
 
-    const handleAddMilestone = (push) => {
-        push('');
-    };
-
-    const handleRemoveMilestone = (index, remove) => {
-        remove(index);
-    };
-
+    let workerbid = data.assignedWorkerBid && data.assignedWorkerBid.workerBid || {}
     return (
         <Modal show={openModal} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Worker Bid</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+                <SurveyViewModal surveyData={data.surveyForm} mode={'read'} />
+
                 <Formik
                     initialValues={{
-                        bidPrice: '',
-                        workingHours: '',
-                        milestones: [''],
-                        appointmentDate: new Date(),
+                        bidPrice: workerbid && workerbid.bidPrice || '',
+                        workingHours: workerbid && workerbid.workingHours || '',
+                        milestones: workerbid && workerbid.milestones || [''],
+                        appointmentDate: workerbid && workerbid.appointmentDate || new Date(),
                     }}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
@@ -63,8 +86,9 @@ const Index = ({ openModal, setOpenModal, data }) => {
                                     type="number"
                                     name="bidPrice"
                                     className={`form-control ${touched.bidPrice && errors.bidPrice ? 'is-invalid' : ''}`}
+                                    readOnly={['initialize', 'completed'].includes(jobMode)}
                                 />
-                                <ErrorMessage name="bidPrice" component="div" className="invalid-feedback" />
+                                {/* <ErrorMessage name="bidPrice" component="div" className="invalid-feedback" /> */}
                             </div>
                             <div className="mb-3">
                                 <label className="form-label">Working Hours</label>
@@ -72,8 +96,9 @@ const Index = ({ openModal, setOpenModal, data }) => {
                                     type="number"
                                     name="workingHours"
                                     className={`form-control ${touched.workingHours && errors.workingHours ? 'is-invalid' : ''}`}
+                                    readOnly={['initialize', 'completed'].includes(jobMode)}
+
                                 />
-                                <ErrorMessage name="workingHours" component="div" className="invalid-feedback" />
                             </div>
                             <div className="mb-3">
                                 <label className="form-label">Milestones</label>
@@ -87,16 +112,14 @@ const Index = ({ openModal, setOpenModal, data }) => {
                                                         name={`milestones[${index}]`}
                                                         className={`form-control ${touched.milestones?.[index] && errors.milestones?.[index] ? 'is-invalid' : ''
                                                             }`}
+
+                                                        readOnly={['initialize', 'completed'].includes(jobMode)}
+
                                                     />
-                                                    <Button variant="danger" onClick={() => handleRemoveMilestone(index, remove)}>
-                                                        -
-                                                    </Button>
-                                                    <ErrorMessage name={`milestones[${index}]`} component="div" className="invalid-feedback" />
+
                                                 </div>
                                             ))}
-                                            <Button variant="primary" onClick={() => handleAddMilestone(push)}>
-                                                Add Milestone
-                                            </Button>
+
                                         </div>
                                     )}
                                 </FieldArray>
@@ -107,13 +130,16 @@ const Index = ({ openModal, setOpenModal, data }) => {
                                     name="appointmentDate"
                                     value={values.appointmentDate}
                                     onChange={(value) => setFieldValue('appointmentDate', value)}
+                                    disabled={['initialize', 'completed'].includes(jobMode)}
                                     className={`form-control ${touched.appointmentDate && errors.appointmentDate ? 'is-invalid' : ''}`}
                                 />
-                                <ErrorMessage name="appointmentDate" component="div" className="invalid-feedback" />
                             </div>
                             <div className="text-center">
-                                <Button type="submit" variant="success">
-                                    Submit Bid
+                                <Button type="submit" variant="primary">
+                                    {jobMode == 'bid'  && role == 'worker' && ' Submit Bid'}
+                                    {jobMode == 'completed' && role == 'worker' && ' Submit For Review'}
+                                    {jobMode == 'initialize'  && role == 'worker' && ' Initialize Job'}
+                                    {jobMode == 'not_paid' && role == 'manager' && 'Request Payment'}
                                 </Button>
                             </div>
                         </Form>

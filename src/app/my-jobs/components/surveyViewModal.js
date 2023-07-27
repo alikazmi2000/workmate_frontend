@@ -2,7 +2,7 @@ import React from 'react';
 import * as Survey from 'survey-react';
 import 'survey-react/survey.css';
 
-const SurveyViewModal = ({ surveyData, onClose }) => {
+const SurveyViewModal = ({ surveyData, onClose, mode = 'modal' }) => {
   const surveyJSON = {
     pages: [
       {
@@ -56,9 +56,12 @@ const SurveyViewModal = ({ surveyData, onClose }) => {
         model={model} // Use the new model instance
         showCompletedPage={false}
       />
-      <button className="btn btn-primary" onClick={onClose}>
-        Close
-      </button>
+      {mode == 'modal' && (
+        <button className="btn btn-primary" onClick={onClose}>
+          Close
+        </button>
+      )}
+
     </div>
   );
 };

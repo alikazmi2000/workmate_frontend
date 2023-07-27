@@ -6,7 +6,7 @@ import CancelModal from "./cancelModal";
 import WorkerBidModal from "./workerBidModal";
 import moment from "moment";
 import { BiRefresh, BiTimeFive, BiMoney, BiTrash } from "react-icons/bi";
-import { AiFillEye } from "react-icons/ai";
+import { AiFillEye, AiFillPlayCircle, AiFillCheckCircle } from "react-icons/ai";
 import { FcSurvey } from "react-icons/fc";
 import { DataGetAction } from "../../redux/actions/actionUtils";
 import { Pagination } from 'react-bootstrap'; // Import Pagination component
@@ -20,6 +20,7 @@ const Index = () => {
     const [openWorkerBidModal, setOpenWorkerBidModal] = useState(false);
     const [openCancelModal, setOpenCancelModal] = useState(false);
     const [selectedRow, setSelectedRow] = useState({});
+    const [jobMode, setJobMode] = useState('bid');
     const tableData = useSelector((state) => state.job.jobs) || [];
     const pagination = useSelector((state) => state.job.pagination) || {};
     const dispatch = useDispatch();
@@ -37,8 +38,10 @@ const Index = () => {
         setOpenCancelModal(true);
         setSelectedRow(row)
     }
-    const onBid = (row) => {
+
+    const jobAction = (row, mode) => {
         setOpenWorkerBidModal(true);
+        setJobMode(mode)
         setSelectedRow(row)
     }
     useEffect(() => {
@@ -68,6 +71,8 @@ const Index = () => {
                 return <label className="badge badge-success">Completed</label>;
             case 'paid':
                 return <label className="badge badge-success">Paid</label>;
+            case 'not_paid':
+                return <label className="badge badge-danger">Not Paid</label>;
             case 'finished':
                 return <label className="badge badge-success">Finished</label>;
             case 'cancelled':
@@ -109,7 +114,63 @@ const Index = () => {
                     color: 'blue'
                 }}>View Bids</span>
         }
+        if (data.status == 'confirmed' && data.assignedTo && userData.id == data.assignedTo._id && userData.role == 'worker') {
+            return <AiFillPlayCircle
+                title='initialize'
+                size={'1.2rem'}
+                onClick={() => {
+                    jobAction(data, 'initialize');
 
+                }}
+                style={{
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    color: 'blue'
+                }} />
+        }
+
+        if (data.status == 'in_progress' && data.assignedTo && userData.id == data.assignedTo._id && userData.role == 'worker') {
+            return <AiFillCheckCircle
+                title='Finish'
+                size={'1.2rem'}
+                onClick={() => {
+                    jobAction(data, 'completed');
+
+                }}
+                style={{
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    color: 'green'
+                }} />
+        }
+        if (data.status == 'completed' && data.jobManager && userData.id == data.jobManager._id && userData.role == 'manager') {
+            return <AiFillEye
+                title='Review & Close'
+                size={'1.4rem'}
+                onClick={() => {
+                    jobAction(data, 'not_paid');
+
+                }}
+                style={{
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    color: 'green'
+                }} />
+        }
+        if (data.status == 'not_paid' && data.jobManager && userData.id == data.jobManager._id && userData.role == 'manager') {
+            return <AiFillEye
+                title='View'
+                size={'1.4rem'}
+                onClick={() => {
+                    jobAction(data, 'view');
+
+                }}
+                style={{
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    color: 'red'
+                }} />
+        }
     }
     return (
         <div className="row">
@@ -212,7 +273,13 @@ const Index = () => {
             <ScheduleModal openModal={openScheduleModal} setOpenModal={setOpenScheduleModal} data={selectedRow} />
             <SurveyModal openModal={openSurveyModal} setOpenModal={setOpenSurveyModal} data={selectedRow} />
             <CancelModal openModal={openCancelModal} setOpenModal={setOpenCancelModal} data={selectedRow} />
-            <WorkerBidModal openModal={openWorkerBidModal} setOpenModal={setOpenWorkerBidModal} data={selectedRow} />
+            <WorkerBidModal openModal={openWorkerBidModal}
+                setOpenModal={setOpenWorkerBidModal}
+                data={selectedRow}
+                jobMode={jobMode}
+                setJobMode={setJobMode}
+                role={userData.role}
+            />
         </div >
     )
 }

@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch } from "react-redux";
 import { Link } from 'react-router-dom';
 import { Formik, Field, Form } from 'formik';
 import * as yup from 'yup';
 import { DataRequestAction } from "../redux/actions/actionUtils";
 import { Button } from 'react-bootstrap';
-
+import { useSelector } from "react-redux"
+import { useHistory } from "react-router-dom";
 const Login = () => {
   const dispatch = useDispatch();
   const validationSchema = yup.object().shape({
@@ -13,12 +14,14 @@ const Login = () => {
     password: yup.string().required('Password is required'),
     role: yup.string().required('Role is required'),
   });
-
+  const token = useSelector((state) => state.user.token);
+  debugger;
+  console.log("STATE=========",token);
+  const history = useHistory();
   const handleSubmit = async (values) => {
     try {
       await validationSchema.validate(values, { abortEarly: false });
       dispatch(DataRequestAction("POST", "users/login", values));
-      alert(JSON.stringify(values, null, 2));
     } catch (error) {
       const validationErrors = {};
       error.inner.forEach((err) => {
@@ -27,7 +30,12 @@ const Login = () => {
       console.log('Validation errors:', validationErrors);
     }
   }
-
+  useEffect(() => {
+    console.log("STATE=========",token);
+    if (token != null) {
+      history.push("/");
+    }
+  }, [token])
   return (
     <div>
       <div className="d-flex align-items-center auth px-0">
@@ -43,7 +51,7 @@ const Login = () => {
                 initialValues={{
                   email: '',
                   password: '',
-                  role:''
+                  role: ''
                 }}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
@@ -87,7 +95,7 @@ const Login = () => {
                       </button>
                     </div>
                     <div className="text-center mt-4 font-weight-light">
-                      Don't have an account? <Link to="/user-pages/register" className="text-primary">Create</Link>
+                      Don't have an account? <Link to="/sign-up" className="text-primary">Create</Link>
                     </div>
                   </Form>
                 )}

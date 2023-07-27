@@ -152,7 +152,7 @@ const Index = () => {
                                                     <td>{e.name}</td>
                                                     <td>{e.description}</td>
                                                     <td>{e.category}</td>
-                                                    <td>{e.assignedTo}</td>
+                                                    <td>{e.assignedTo && e.assignedTo.firstName + ' ' + e.assignedTo.lastName}</td>
                                                     <td>{e.jobRequester && e.jobRequester.firstName + ' ' + e.jobRequester.lastName}</td>
                                                     <td>{e.jobManager && e.jobManager.firstName + ' ' + e.jobManager.lastName}</td>
                                                     <td>{e.jobVendor && e.jobVendor.firstName + ' ' + e.jobVendor.lastName}</td>

@@ -66,7 +66,7 @@ const Index = () => {
                 }} />
             </>
         }
-        if ( data.status == 'new')
+        if (data.status == 'new')
             return <BsPlay color='green' size={"1.4rem"} onClick={() => { onStart(data) }} ></BsPlay>
 
 
@@ -80,7 +80,7 @@ const Index = () => {
         }
         if (data.status == 'active' && userData.role == 'vendor') {
             return <>
-                <BiMoney  color='green' title='Vendor Bid' size={'1.4rem'} style={{ cursor: 'pointer' }} onClick={() => {
+                <BiMoney color='green' title='Vendor Bid' size={'1.4rem'} style={{ cursor: 'pointer' }} onClick={() => {
                     onVendorBid(data)
 
                 }} />
@@ -139,7 +139,9 @@ const Index = () => {
                                 <BiRefresh onClick={() => {
                                     dispatch(DataGetAction("jobs/getAll", '', ''))
                                 }} size={'1.4rem'} className='ml-3 float-right' />
-                                <button type="button" onClick={() => setOpenModal(true)} className="btn btn-primary float-right">Add</button>
+                                {userData.role === 'customer' && (
+                                    <button type="button" onClick={() => setOpenModal(true)} className="btn btn-primary float-right">Add</button>
+                                )}
                             </div>
                         </div>
                         <div className="table-responsive">
@@ -216,7 +218,7 @@ const Index = () => {
             {openWorkerBidModal && (
                 <WorkerBidModal openModal={openWorkerBidModal} setOpenModal={setOpenWorkerBidModal} data={selectedRow} />
             )}
-             {openVendorBidModal && (
+            {openVendorBidModal && (
                 <VendorBidModal openModal={openVendorBidModal} setOpenModal={setOpenVendorBidModal} data={selectedRow} />
             )}
             <CancelModal openModal={openCancelModal} setOpenModal={setOpenCancelModal} data={selectedRow} />

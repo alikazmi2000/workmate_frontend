@@ -15,8 +15,6 @@ const Login = () => {
     role: yup.string().required('Role is required'),
   });
   const token = useSelector((state) => state.user.token);
-  debugger;
-  console.log("STATE=========",token);
   const history = useHistory();
   const handleSubmit = async (values) => {
     try {
@@ -27,11 +25,9 @@ const Login = () => {
       error.inner.forEach((err) => {
         validationErrors[err.path] = err.message;
       });
-      console.log('Validation errors:', validationErrors);
     }
   }
   useEffect(() => {
-    console.log("STATE=========",token);
     if (token != null) {
       history.push("/");
     }

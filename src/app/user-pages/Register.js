@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from 'react-router-dom';
 import { Formik, Field, Form } from 'formik';
 import * as yup from 'yup';
-import {DataRequestAction} from "../redux/actions/actionUtils"
+import { DataRequestAction } from "../redux/actions/actionUtils"
+import { useHistory } from "react-router-dom";
+
 const Index = () => {
   const dispatch = useDispatch();
   const validationSchema = yup.object().shape({
@@ -18,23 +20,27 @@ const Index = () => {
       .required('Confirm Password is required'),
     email: yup.string().email('Invalid email format').required('Email is required'),
   });
+  const token = useSelector((state) => state.user.token);
+  const history = useHistory();
 
   const handleSubmit = async (values) => {
     try {
       await validationSchema.validate(values, { abortEarly: false });
-      dispatch(DataRequestAction("POST","users/signup",values));
+      dispatch(DataRequestAction("POST", "users/signup", values));
       // If validation succeeds, continue with form submission logic here
-      alert(JSON.stringify(values, null, 2));
     } catch (error) {
       // If validation fails, handle the validation errors here
       const validationErrors = {};
       error.inner.forEach((err) => {
         validationErrors[err.path] = err.message;
       });
-      console.log('Validation errors:', validationErrors);
     }
   }
-
+  useEffect(() => {
+    if (token != null) {
+      history.push("/");
+    }
+  }, [token])
   return (
     <div>
       <div className="d-flex align-items-center auth px-0">
@@ -56,7 +62,7 @@ const Index = () => {
                   phoneNumber: '',
                   role: '',
                 }}
-              validationSchema={validationSchema} // Add this line to apply validation
+                validationSchema={validationSchema} // Add this line to apply validation
               // onSubmit={async (values) => {
               //   await new Promise((r) => setTimeout(r, 500));
               //   alert(JSON.stringify(values, null, 2));
